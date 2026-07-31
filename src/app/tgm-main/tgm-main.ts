@@ -8,4 +8,15 @@ import { TgmFooter } from "../tgm-footer/tgm-footer";
   templateUrl: './tgm-main.html',
   styleUrl: './tgm-main.scss',
 })
-export class TgmMain {}
+export class TgmMain {
+  list: string[] = [];
+
+  addItem(value: string) {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    this.list = [...this.list, trimmed];
+  }
+}
