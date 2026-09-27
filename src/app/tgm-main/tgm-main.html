@@ -1,15 +1,78 @@
 <div class="card-container">
-  <div class="input-container">
-    <input #newItem type="text" placeholder="Enter your name"
-      (keyup.enter)="addItem(newItem.value); newItem.value = ''" />
-    <button type="button" (click)="addItem(newItem.value); newItem.value = ''">Add</button>
-  </div>
+  @if (!gameStarted()) {
+    <div class="input-container">
+      <input #newItem type="text" placeholder="Enter names separated by ;" aria-label="Player names separated by semicolons"
+        enterkeyhint="send"
+        [disabled]="list().length >= maxNames"
+        (keyup.enter)="addItem(newItem.value); newItem.value = ''" />
+      <button type="button" class="button" [disabled]="list().length >= maxNames"
+        (click)="addItem(newItem.value); newItem.value = ''">Add</button>
+    </div>
 
-  <div>
-    <ul>
-      @for (item of list; track item) {
-        <li>{{ item }}</li>
-      }
-    </ul>
-  </div>
+    <p class="hint">Enter 12–18 players in strength order, strongest first. Separate multiple names with ;</p>
+
+    @if (list().length > 0) {
+      <div>
+        <ol>
+          @for (item of list(); track $index) {
+            <li>{{ item }}</li>
+          }
+        </ol>
+        @if (list().length >= 12) {
+          <button type="button" class="button start-button"
+          (click)="startGame()">Create schedule</button>
+        }
+      </div>
+    }
+  } @else {
+    <section class="schedule" aria-labelledby="schedule-title">
+      <header class="schedule-header">
+        <div>
+          <h2 id="schedule-title">Six-round schedule</h2>
+          <p>Each round has two balanced teams. Players rotate through the positions where possible.</p>
+        </div>
+        <button type="button" class="button edit-button" (click)="editPlayers()">Edit players</button>
+      </header>
+
+      <div class="round-list">
+        @for (round of rounds(); track round.number) {
+          <section class="round-card" [attr.aria-labelledby]="'round-' + round.number">
+            <h3 [id]="'round-' + round.number">Round {{ round.number }}</h3>
+            <div class="games-grid">
+              <article class="team-card">
+                <h4>Game 1</h4>
+                <ol class="lineup">
+                  @for (player of round.teamOne; track $index) {
+                    <li><span class="position">{{ player.position }}</span><span>{{ player.name }}</span></li>
+                  }
+                </ol>
+              </article>
+
+              <article class="team-card">
+                <h4>Game 2</h4>
+                <ol class="lineup">
+                  @for (player of round.teamTwo; track $index) {
+                    <li><span class="position">{{ player.position }}</span><span>{{ player.name }}</span></li>
+                  }
+                </ol>
+              </article>
+
+              <aside class="bench" aria-label="Players on the bench">
+                <h4>Bench ({{ round.bench.length }})</h4>
+                @if (round.bench.length > 0) {
+                  <ul>
+                    @for (player of round.bench; track $index) {
+                      <li>{{ player }}</li>
+                    }
+                  </ul>
+                } @else {
+                  <p>Everyone is playing this round.</p>
+                }
+              </aside>
+            </div>
+          </section>
+        }
+      </div>
+    </section>
+  }
 </div>
